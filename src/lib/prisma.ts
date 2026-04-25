@@ -1,12 +1,13 @@
 import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
-// import { PrismaClient } from "@/src/generated/prisma/client";
 import { PrismaClient } from "@/generated/prisma/client";
-import config from "@/core/config";
 
-const connectionString = config.database.url;
+const connectionString = process.env["DATABASE_URL"];
 
-// Augment globalThis to prevent multiple instances during hot-reloads
+if (!connectionString) {
+  throw new Error("DATABASE_URL is not configured. Please check your .env file.");
+}
+
 const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
 
 export const prisma =

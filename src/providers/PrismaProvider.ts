@@ -23,12 +23,8 @@ export class PrismaProvider implements InfrastructureProvider<PrismaClient> {
     await this.prismaClient.$disconnect();
   }
 
-  /**
-   * Translates Prisma ORM errors into standard domain AppErrors
-   */
   private mapPrismaError(err: any): AppError | null {
-    // ১. হ্যান্ডেল Known Request Errors (যেমন: Unique constraint)
-    if (err.code && typeof err.code === 'string' && err.code.startsWith('P')) {
+    if (err.code && typeof err.code === "string" && err.code.startsWith("P")) {
       switch (err.code) {
         case "P2002":
           return new ConflictError("A record with this data already exists", {
@@ -63,9 +59,11 @@ export class PrismaProvider implements InfrastructureProvider<PrismaClient> {
       }
     }
 
-    // ২. রানটাইম বা কানেকশন এরর চেক
     const errorMessage = err.message || "";
-    if (errorMessage.includes("PrismaClient") || errorMessage.includes("database connection")) {
+    if (
+      errorMessage.includes("PrismaClient") ||
+      errorMessage.includes("database connection")
+    ) {
       return new AppError({
         statusCode: HTTPStatusCode.INTERNAL_SERVER_ERROR,
         message: "Database connection or execution failed",
